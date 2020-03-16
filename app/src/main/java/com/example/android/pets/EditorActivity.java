@@ -27,7 +27,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.example.android.pets.data.PetContract;
 import com.example.android.pets.data.PetContract.PetsEntry;
 
 /**
@@ -51,7 +50,7 @@ public class EditorActivity extends AppCompatActivity {
      * Gender of the pet. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
-    private int mGender = 0;
+    private int mGender = PetsEntry.GENDER_UNKNOWN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +58,10 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         // Find all relevant views that we will need to read user input from
-        mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
-        mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
-        mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
-        mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
+        mNameEditText = findViewById(R.id.edit_pet_name);
+        mBreedEditText = findViewById(R.id.edit_pet_breed);
+        mWeightEditText = findViewById(R.id.edit_pet_weight);
+        mGenderSpinner = findViewById(R.id.spinner_gender);
 
         setupSpinner();
     }
@@ -93,7 +92,7 @@ public class EditorActivity extends AppCompatActivity {
                     } else if (selection.equals(getString(R.string.gender_female))) {
                         mGender = PetsEntry.GENDER_FEMALE; // Female
                     } else {
-                        mGender = PetsEntry.GENDER_OTHER; // Unknown
+                        mGender = PetsEntry.GENDER_UNKNOWN; // Unknown
                     }
                 }
             }
@@ -101,7 +100,7 @@ public class EditorActivity extends AppCompatActivity {
             // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mGender = 0; // Unknown
+                mGender = PetsEntry.GENDER_UNKNOWN; // Unknown
             }
         });
     }
