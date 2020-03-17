@@ -15,6 +15,7 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,6 +35,11 @@ import com.example.android.pets.data.PetDbHelper;
  */
 public class CatalogActivity extends AppCompatActivity {
 
+    /**
+     * Database helper that will provide us access to the database
+     */
+    private PetDbHelper mDbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +55,10 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        mDbHelper = new PetDbHelper(this);
+
         displayDatabaseInfo();
     }
 
@@ -57,9 +67,6 @@ public class CatalogActivity extends AppCompatActivity {
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        PetDbHelper mDbHelper = new PetDbHelper(this);
 
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -87,13 +94,33 @@ public class CatalogActivity extends AppCompatActivity {
         return true;
     }
 
+    private void insertPet() {
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PetsEntry.COLUMN_PET_NAME, "Toto");
+        contentValues.put(PetsEntry.COLUMN_PET_BREED, "Terrier");
+        contentValues.put(PetsEntry.COLUMN_PET_GENDER, PetsEntry.GENDER_MALE);
+        contentValues.put(PetsEntry.COLUMN_PET_WEIGHT, 7);
+
+        long newRowId = db.insert(
+                PetsEntry.TABLE_NAME,
+                null, contentValues
+        );
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                // Do nothing for now
+
+                insertPet();
+
+                displayDatabaseInfo();
+
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
