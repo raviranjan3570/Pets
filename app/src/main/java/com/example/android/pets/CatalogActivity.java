@@ -18,7 +18,7 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -140,18 +140,17 @@ public class CatalogActivity extends AppCompatActivity {
 
     private void insertPet() {
 
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(PetsEntry.COLUMN_PET_NAME, "Toto");
         contentValues.put(PetsEntry.COLUMN_PET_BREED, "Terrier");
         contentValues.put(PetsEntry.COLUMN_PET_GENDER, PetsEntry.GENDER_MALE);
         contentValues.put(PetsEntry.COLUMN_PET_WEIGHT, 7);
 
-        long newRowId = db.insert(
-                PetsEntry.TABLE_NAME,
-                null, contentValues
-        );
+        // Insert a new row for Toto into the provider using the ContentResolver.
+        // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
+        // into the pets database table.
+        // Receive the new content URI that will allow us to access Toto's data in the future.
+        Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
     }
 
     @Override
