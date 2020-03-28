@@ -25,7 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.android.pets.data.PetContract.PetsEntry;
 import com.example.android.pets.data.PetDbHelper;
@@ -84,50 +84,12 @@ public class CatalogActivity extends AppCompatActivity {
 
         Cursor cursor = getContentResolver().query(PetsEntry.CONTENT_URI, projection, null, null, null);
 
-        TextView displayView = findViewById(R.id.text_view_pet);
-
-
-        try {
-
-            // In the while loop below, iterate through the rows of the cursor and display
-            // the information from each column in this order.
-            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-            displayView.append(PetsEntry._ID + " - " +
-                    PetsEntry.COLUMN_PET_NAME + " - " +
-                    PetsEntry.COLUMN_PET_BREED + " - " +
-                    PetsEntry.COLUMN_PET_GENDER + " - " +
-                    PetsEntry.COLUMN_PET_WEIGHT + "\n");
-
-            // Figure out the index of each column
-            int idColumnIndex = cursor.getColumnIndex(PetsEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_NAME);
-            int breedColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_BREED);
-            int genderColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_GENDER);
-            int weightColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_WEIGHT);
-
-            // Iterate through all the returned rows in the cursor
-            while (cursor.moveToNext()) {
-                // Use that index to extract the String or Int value of the word
-                // at the current row the cursor is on.
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
-                String currentBreed = cursor.getString(breedColumnIndex);
-                String currentGender = cursor.getString(genderColumnIndex);
-                int currentWeight = cursor.getInt(weightColumnIndex);
-
-                // Display the values from each column of the current row in the cursor in the TextView
-                displayView.append(("\n" + currentID + " - " +
-                        currentName + " - " +
-                        currentBreed + " - " +
-                        currentGender + " - " +
-                        currentWeight
-                ));
-            }
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
+        // Find ListView to populate
+        ListView petListView = findViewById(R.id.list);
+        // Setup cursor adapter using cursor from last step
+        PetCursorAdapter petAdapter = new PetCursorAdapter(this, cursor);
+        // Attach cursor adapter to the ListView
+        petListView.setAdapter(petAdapter);
     }
 
     @Override
