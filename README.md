@@ -6,9 +6,8 @@ This app displays a list of pets and their related data that the user inputs.
 Pre-requisites
 --------------
 
-- Android SDK v24
-- Android Build Tools v23.0.3
-- Android Support Repository v24.1.1
+- Android SDK v23
+- Android Build Tools v28.0.3
 
 Getting Started
 ---------------
@@ -28,7 +27,7 @@ submitting a pull request through GitHub. Please see CONTRIBUTING.md for more de
 License
 -------
 
-Copyright 2016 The Android Open Source Project, Inc.
+Copyright 2020 The Android Open Source Project, Inc.
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for
