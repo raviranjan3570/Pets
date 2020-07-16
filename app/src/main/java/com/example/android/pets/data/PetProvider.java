@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.Objects;
+
 public class PetProvider extends ContentProvider {
 
     /**
@@ -116,6 +118,7 @@ public class PetProvider extends ContentProvider {
             return null;
         }
 
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         // Once we know the ID of the new row in the table,
         // return the new URI with the ID appended to the end of it
         return ContentUris.withAppendedId(uri, id);
@@ -131,15 +134,18 @@ public class PetProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         final int match = sUriMatcher.match(uri);
+        int rowsDeleted = 0;
         switch (match) {
             case PETS:
                 // Delete all rows that match the selection and selection args
-                return database.delete(PetContract.PetsEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(PetContract.PetsEntry.TABLE_NAME, selection, selectionArgs);
+                return rowsDeleted;
             case PET_ID:
                 // Delete a single row given by the ID in the URI
                 selection = PetContract.PetsEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(PetContract.PetsEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(PetContract.PetsEntry.TABLE_NAME, selection, selectionArgs);
+                return rowsDeleted;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
@@ -212,9 +218,11 @@ public class PetProvider extends ContentProvider {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
+        int rowsUpdated = database.update(PetContract.PetsEntry.TABLE_NAME, values, selection, selectionArgs);
+        if (rowsUpdated != 0)
+            Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         // Update the pet with the given values
-
-        return database.update(PetContract.PetsEntry.TABLE_NAME, values, selection, selectionArgs);
+        return rowsUpdated;
     }
 
 
@@ -271,6 +279,7 @@ public class PetProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
+        cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         return cursor;
     }
 }
