@@ -15,10 +15,18 @@
  */
 package com.example.android.pets;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -36,27 +44,38 @@ import com.example.android.pets.data.PetDbHelper;
 /**
  * Allows user to create a new pet or edit an existing one.
  */
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private PetDbHelper mDbHelper;
 
-    /** EditText field to enter the pet's name */
+    /**
+     * EditText field to enter the pet's name
+     */
     private EditText mNameEditText;
 
-    /** EditText field to enter the pet's breed */
+    /**
+     * EditText field to enter the pet's breed
+     */
     private EditText mBreedEditText;
 
-    /** EditText field to enter the pet's weight */
+    /**
+     * EditText field to enter the pet's weight
+     */
     private EditText mWeightEditText;
 
-    /** EditText field to enter the pet's gender */
+    /**
+     * EditText field to enter the pet's gender
+     */
     private Spinner mGenderSpinner;
+
+    private static final int EDITOR_LOADER = 0;
 
     /**
      * Gender of the pet. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
     private int mGender = PetsEntry.GENDER_UNKNOWN;
+    private Uri mCurrentUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +93,12 @@ public class EditorActivity extends AppCompatActivity {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         mDbHelper = new PetDbHelper(this);
+        Intent intent = getIntent();
+        mCurrentUri = intent.getData();
+        if (mCurrentUri != null) {
+            setTitle(getString(R.string.editor_activity_title_edit_pet));
+            getSupportLoaderManager().initLoader(EDITOR_LOADER, null, this);
+        } else setTitle(getString(R.string.editor_activity_title_add_pet));
     }
 
     /**
@@ -171,5 +196,69 @@ public class EditorActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+
+        String[] projection = {
+                PetsEntry._ID,
+                PetsEntry.COLUMN_PET_NAME,
+                PetsEntry.COLUMN_PET_BREED,
+                PetsEntry.COLUMN_PET_GENDER,
+                PetsEntry.COLUMN_PET_WEIGHT
+        };
+
+        return new CursorLoader(this,
+                mCurrentUri,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null || cursor.getCount() < 1) return;
+        if (cursor.moveToFirst()) {
+
+            int nameColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_NAME);
+            int breedColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_BREED);
+            int genderColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_GENDER);
+            int weightColumnIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_WEIGHT);
+
+            String name = cursor.getString(nameColumnIndex);
+            String breed = cursor.getString(breedColumnIndex);
+            int gender = cursor.getInt(genderColumnIndex);
+            int weight = cursor.getInt(weightColumnIndex);
+
+            mNameEditText.setText(name);
+            mBreedEditText.setText(breed);
+            mWeightEditText.setText(Integer.toString(weight));
+
+            switch (gender) {
+
+                case PetsEntry.GENDER_MALE:
+                    mGenderSpinner.setSelection(0);
+                    break;
+                case PetsEntry.GENDER_FEMALE:
+                    mGenderSpinner.setSelection(1);
+                    break;
+                default:
+                    mGenderSpinner.setSelection(2);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+        mNameEditText.setText("");
+        mBreedEditText.setText("");
+        mWeightEditText.setText("");
+        mGenderSpinner.setSelection(0);
     }
 }

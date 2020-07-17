@@ -10,7 +10,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Name for the application [CHAR LIMIT=12] -->
     <string name="app_name">Pets</string>
 
@@ -66,9 +66,12 @@
     <string name="editor_insert_pet_failed">Error with saving pet</string>
 
     <!-- Title text for the empty view, which describes the empty dog house image [CHAR LIMIT=50] -->
-    <string name="empty_view_title_text">It\'s a bit lonely here...</string>
+    <string name="empty_view_title_text" tools:ignore="TypographyEllipsis">It\'s a bit lonely here...</string>
 
     <!-- Subtitle text for the empty view that prompts the user to add a pet [CHAR LIMIT=50] -->
     <string name="empty_view_subtitle_text">Get started by adding a pet</string>
     <string name="empty_image_view_desc">Image used for empty view of catalog activity</string>
+
+    <string name="editor_activity_title_edit_pet">Edit pet</string>
+    <string name="editor_activity_title_add_pet">Add a new pet</string>
 </resources>
