@@ -86,6 +86,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     };
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (mCurrentUri == null) {
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setVisible(false);
+        }
+        return true;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +123,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (mCurrentUri != null) {
             setTitle(getString(R.string.editor_activity_title_edit_pet));
             getSupportLoaderManager().initLoader(EDITOR_LOADER, null, this);
-        } else setTitle(getString(R.string.editor_activity_title_add_pet));
+        } else {
+            setTitle(getString(R.string.editor_activity_title_add_pet));
+            invalidateOptionsMenu();
+        }
     }
 
     private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener) {
