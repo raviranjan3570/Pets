@@ -58,7 +58,7 @@ public final class PetContract {
          * or {@link #GENDER_FEMALE}.
          */
         public static boolean isValidGender(int gender) {
-            return gender == GENDER_UNKNOWN || gender == GENDER_MALE || gender == GENDER_FEMALE;
+            return gender != GENDER_UNKNOWN && gender != GENDER_MALE && gender != GENDER_FEMALE;
         }
 
         /**

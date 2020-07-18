@@ -39,14 +39,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetsEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private PetDbHelper mDbHelper;
 
     /**
      * EditText field to enter the pet's name
@@ -92,7 +89,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
+        //PetDbHelper mDbHelper = new PetDbHelper(this);
         Intent intent = getIntent();
         mCurrentUri = intent.getData();
         if (mCurrentUri != null) {
@@ -107,7 +104,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
-        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.array_gender_options, android.R.layout.simple_spinner_item);
 
         // Specify dropdown layout style - simple list view with 1 item per line
@@ -140,7 +137,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    private void insertPet() {
+    private void savePet() {
 
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
@@ -153,16 +150,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         contentValues.put(PetsEntry.COLUMN_PET_GENDER, mGender);
         contentValues.put(PetsEntry.COLUMN_PET_WEIGHT, weightInt);
 
-        // Insert a new pet into the provider, returning the content URI for the new pet.
-        Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
+        if (mCurrentUri == null) {
 
-        // Show a toast message depending on whether or not the insertion was successful
-        if (newUri == null) {
-            // If the row ID is -1, then there was an error with insertion.
-            Toast.makeText(this, R.string.editor_insert_pet_failed, Toast.LENGTH_SHORT).show();
+            // Insert a new pet into the provider, returning the content URI for the new pet.
+            Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
+
+            // Show a toast message depending on whether or not the insertion was successful
+            if (newUri == null) {
+                // If the row ID is -1, then there was an error with insertion.
+                Toast.makeText(this, R.string.editor_insert_pet_failed, Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast with the row ID.
+                Toast.makeText(this, R.string.editor_insert_pet_successful, Toast.LENGTH_SHORT).show();
+            }
         } else {
-            // Otherwise, the insertion was successful and we can display a toast with the row ID.
-            Toast.makeText(this, R.string.editor_insert_pet_successful, Toast.LENGTH_SHORT).show();
+
+            int rowsAffected = getContentResolver().update(mCurrentUri, contentValues, null, null);
+            if (rowsAffected == 0) {
+                Toast.makeText(this, getString(R.string.update_pet_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.update_pet_successful), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -181,7 +189,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // insert pet into database from editor activity
-                insertPet();
+                savePet();
                 // exit activity
                 finish();
                 return true;

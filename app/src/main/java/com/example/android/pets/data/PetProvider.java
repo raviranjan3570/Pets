@@ -74,13 +74,11 @@ public class PetProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
 
         final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case PETS:
-                assert contentValues != null;
-                return insertPet(uri, contentValues);
-            default:
-                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        if (match == PETS) {
+            assert contentValues != null;
+            return insertPet(uri, contentValues);
         }
+        throw new IllegalArgumentException("Insertion is not supported for " + uri);
     }
 
     /**
@@ -96,7 +94,7 @@ public class PetProvider extends ContentProvider {
         }
 
         Integer gender = values.getAsInteger(PetContract.PetsEntry.COLUMN_PET_GENDER);
-        if (gender == null || !PetContract.PetsEntry.isValidGender(gender)) {
+        if (gender == null || PetContract.PetsEntry.isValidGender(gender)) {
             throw new IllegalArgumentException("Pet requires valid gender");
         }
 
@@ -134,7 +132,7 @@ public class PetProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         final int match = sUriMatcher.match(uri);
-        int rowsDeleted = 0;
+        int rowsDeleted;
         switch (match) {
             case PETS:
                 // Delete all rows that match the selection and selection args
@@ -195,7 +193,7 @@ public class PetProvider extends ContentProvider {
         // check that the gender value is valid.
         if (values.containsKey(PetContract.PetsEntry.COLUMN_PET_GENDER)) {
             Integer gender = values.getAsInteger(PetContract.PetsEntry.COLUMN_PET_GENDER);
-            if (gender == null || !PetContract.PetsEntry.isValidGender(gender)) {
+            if (gender == null || PetContract.PetsEntry.isValidGender(gender)) {
                 throw new IllegalArgumentException("Pet requires valid gender");
             }
         }

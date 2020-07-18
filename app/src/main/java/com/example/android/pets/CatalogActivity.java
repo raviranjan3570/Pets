@@ -35,17 +35,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.pets.data.PetContract.PetsEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /**
-     * Database helper that will provide us access to the database
-     */
-    private PetDbHelper mDbHelper;
     private static final int PET_LOADER = 0;
     private PetCursorAdapter mCursorAdapter;
 
@@ -66,7 +61,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
+        //PetDbHelper mDbHelper = new PetDbHelper(this);
 
         // Find the ListView which will be populated with the pet data
         ListView petListView = findViewById(R.id.list);
@@ -109,7 +104,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
         // into the pets database table.
         // Receive the new content URI that will allow us to access Toto's data in the future.
-        Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
+        //Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
     }
 
     @Override
