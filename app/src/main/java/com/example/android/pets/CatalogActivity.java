@@ -104,7 +104,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
         // into the pets database table.
         // Receive the new content URI that will allow us to access Toto's data in the future.
-        //Uri newUri = getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
+        getContentResolver().insert(PetsEntry.CONTENT_URI, contentValues);
     }
 
     @Override
